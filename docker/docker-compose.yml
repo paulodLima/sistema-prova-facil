@@ -4,17 +4,41 @@ services:
     image: postgres
     container_name: postgres_provas_db
     environment:
-      - POSTGRES_USER=prova
-      - POSTGRES_PASSWORD=prova
-      - POSTGRES_DB=provas_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     ports:
-      - "5434:5432"
+      - "5432:5432"
     volumes:
       - ./postgres:/var/lib/postgresql/data
       - ./sql/01-modelo.sql:/docker-entrypoint-initdb.d/01-modelo.sql
     restart: always
     networks:
       - prova-facil-network
+  backend:
+    build:
+      context: ../prova-facil
+    container_name: kotlin_backend
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8080:8080"
+    networks:
+      - prova-facil-network  
+  frontend:
+    build:
+      context: ../prova-facil-app
+    container_name: angular_frontend
+    ports:
+      - "4200:4200"
+    depends_on:
+      - backend  
+      
+    networks:
+      - prova-facil-network      
 networks:
   prova-facil-network:
     driver: bridge
