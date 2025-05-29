@@ -1,0 +1,23 @@
+name: prova-facil
+services:
+  postgres:
+    image: postgres
+    container_name: postgres_provas_db
+    environment:
+      - POSTGRES_USER=prova
+      - POSTGRES_PASSWORD=prova
+      - POSTGRES_DB=provas_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+      - ./sql/01-modelo.sql:/docker-entrypoint-initdb.d/01-modelo.sql
+    restart: always
+    networks:
+      - prova-facil-network
+networks:
+  prova-facil-network:
+    driver: bridge
+
+volumes:
+  data:
